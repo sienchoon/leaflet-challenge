@@ -1,4 +1,4 @@
-/ loading the GeoJSON data
+// loading the GeoJSON data
 let geoData = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson"
 
 // Creating leaflet map
