@@ -1,11 +1,9 @@
 // loading the GeoJSON data
-let geoData = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson"
+let geoData = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson"
+
 
 // Creating leaflet map
-let Map = L.Map("map", {
-    centre: [42.87, -98.38],
-    zoom: 4
-});
+let Map = L.map("map").setView([42.87, -98.38], 4);
 
 // adding title layer
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -45,7 +43,7 @@ const mapMarker = (feature) => {
 
 // use d3 and load data from USGS website
 
-d3.json(geoData, function(data) {
+d3.json(geoData).then(function(data) {
     // load the data
     L.geoJson(data, {
         pointToLayer: (feature, latlng) => {
@@ -66,6 +64,25 @@ d3.json(geoData, function(data) {
           layer.closePopup();
         },
       }).addTo(Map); // Adding the data to the map.
+      createLegend();
     });
     
+const depthColors = ["lightgreen", "yellow", "gold", "orange", "darkorange", "red"];  // https://gis.stackexchange.com/questions/133630/adding-leaflet-legend 
+function createLegend() {
+let legend = L.control({ position: 'bottomright' });
+legend.onAdd = function () {
+  var div = L.DomUtil.create('div', 'info legend');
+  labels = ["<div style='background-color: lightgray'><strong>Depth (km)</strong></div>"]; // Add a legend title.
+  categories = ['-10-10', ' 10-30', ' 30-50', ' 50-70', ' 70-90', '90+']; // Add legend categories.
+  for (var i = 0; i < categories.length; i++) { // Iterate over the categories and add them to the legend.
+    div.innerHTML +=
+      labels.push(
+        '<li class="circle" style="background-color:' + depthColors[i] + '">' + categories[i] + '</li> '
+      );
+  }
+  // Set the inner HTML of the legend element.
+  div.innerHTML = '<ul style="list-style-type:none; text-align: center; font-size: 14px;">' + labels.join('') + '</ul>'
+  return div;
+};
+legend.addTo(Map);}
 
